@@ -30,6 +30,7 @@ func createSnippet(rw http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		// tells what methods are allowed
 		rw.Header().Set("Allow", "POST")
+		rw.Header().Add("Content-Type", "application/json")
 
 		//// writes the header
 		//rw.WriteHeader(http.StatusMethodNotAllowed)
@@ -41,6 +42,11 @@ func createSnippet(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	// setting and changing system generated headers
+	rw.Header().Set("Content-Type", "application/json")
+
+	//Suppressing system generated headers
+	rw.Header()["Date"] = nil
 	rw.Write([]byte("Create a new snippet..."))
 
 }
