@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,7 +13,17 @@ func home(rw http.ResponseWriter, req *http.Request) {
 		http.NotFound(rw, req)
 		return
 	}
-	rw.Write([]byte("<h1>Hello, welcome to GoSnippet</h1>"))
+	ts, err := template.ParseFiles("./ui/html/home.page.gohtml")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	err = ts.Execute(rw, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func showSnippet(rw http.ResponseWriter, req *http.Request) {
