@@ -9,6 +9,7 @@ import (
 )
 
 func home(rw http.ResponseWriter, req *http.Request) {
+
 	if req.URL.Path != "/" {
 		http.NotFound(rw, req)
 		return
