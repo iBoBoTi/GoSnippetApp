@@ -14,7 +14,11 @@ func home(rw http.ResponseWriter, req *http.Request) {
 		http.NotFound(rw, req)
 		return
 	}
-	ts, err := template.ParseFiles("./ui/html/home.page.gohtml")
+	files := []string{
+		"./ui/html/home.page.gohtml",
+		"./ui/html/base.layout.gohtml",
+	}
+	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
