@@ -17,6 +17,7 @@ func home(rw http.ResponseWriter, req *http.Request) {
 	files := []string{
 		"./ui/html/home.page.gohtml",
 		"./ui/html/base.layout.gohtml",
+		"./ui/html/footer.partial.gohtml",
 	}
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
