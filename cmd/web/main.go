@@ -8,9 +8,6 @@ import (
 )
 
 func main() {
-	//cfg := new(helpers.Config)
-	//flag.StringVar(&cfg.Addr, "addr", ":4000", "HTTP network address")
-	//flag.StringVar(&cfg.StaticDir, "static-dir", "./ui/static", "Path to static files")
 
 	addr := flag.String("addr", ":4000", "HTTP network address")
 
@@ -24,17 +21,10 @@ func main() {
 		infoLog:  infoLog,
 	}
 
-	mux := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir("./ui/static"))
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet", app.showSnippet)
-	mux.HandleFunc("/snippet/create", app.createSnippet)
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-
 	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,
-		Handler:  mux,
+		Handler:  app.Routes(),
 	}
 
 	infoLog.Printf("Starting server at port %s", *addr)
