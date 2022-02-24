@@ -16,7 +16,8 @@ type application struct {
 func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path != "/" {
-		http.NotFound(rw, req)
+		//http.NotFound(rw, req)
+		app.notFound(rw)
 		return
 	}
 	files := []string{
@@ -26,20 +27,23 @@ func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 	}
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		//http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(rw, err)
 		return
 	}
 	err = ts.Execute(rw, nil)
 	if err != nil {
 		app.errorLog.Println(err.Error())
-		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		//http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(rw, err)
 	}
 }
 
 func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 	id, err := strconv.Atoi(req.URL.Query().Get("id"))
 	if err != nil || id < 1 {
-		http.NotFound(rw, req)
+		//http.NotFound(rw, req)
+		app.notFound(rw)
 		return
 	}
 	//rw.Write([]byte("Display a specific snippet ..."))
@@ -59,7 +63,8 @@ func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request)
 		//rw.Write([]byte("Method Not Allowed\n"))
 
 		// shortcut for the above code --> combines WriteHeader method and Write method for non 200 status code
-		http.Error(rw, "Method Not Allowed", http.StatusMethodNotAllowed)
+		//http.Error(rw, "Method Not Allowed", http.StatusMethodNotAllowed)
+		app.clientError(rw, http.StatusMethodNotAllowed)
 		return
 	}
 	// setting and changing system generated headers
