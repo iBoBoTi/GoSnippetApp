@@ -1,16 +1,42 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet", showSnippet)
-	mux.HandleFunc("/snippet/create", createSnippet)
+	//cfg := new(helpers.Config)
+	//flag.StringVar(&cfg.Addr, "addr", ":4000", "HTTP network address")
+	//flag.StringVar(&cfg.StaticDir, "static-dir", "./ui/static", "Path to static files")
 
-	log.Println("Starting server at port :4000")
-	log.Fatal(http.ListenAndServe(":4000", mux))
+	addr := flag.String("addr", ":4000", "HTTP network address")
+
+	flag.Parse()
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+
+	mux := http.NewServeMux()
+	fileServer := http.FileServer(http.Dir("./ui/static"))
+	mux.HandleFunc("/", app.home)
+	mux.HandleFunc("/snippet", app.showSnippet)
+	mux.HandleFunc("/snippet/create", app.createSnippet)
+	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+
+	srv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errorLog,
+		Handler:  mux,
+	}
+
+	infoLog.Printf("Starting server at port %s", *addr)
+	errorLog.Fatal(srv.ListenAndServe())
 }
