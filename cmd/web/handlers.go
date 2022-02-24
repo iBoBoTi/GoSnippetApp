@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/iBoBoTi/go-snippet/pkg/models/mysql"
 	"html/template"
 	"log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	snippets *mysql.SnippetModel
 }
 
 func (app *application) home(rw http.ResponseWriter, req *http.Request) {
