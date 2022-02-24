@@ -8,7 +8,12 @@ import (
 	"strconv"
 )
 
-func home(rw http.ResponseWriter, req *http.Request) {
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+}
+
+func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path != "/" {
 		http.NotFound(rw, req)
@@ -21,20 +26,18 @@ func home(rw http.ResponseWriter, req *http.Request) {
 	}
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
 		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	err = ts.Execute(rw, nil)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
 
-func showSnippet(rw http.ResponseWriter, req *http.Request) {
+func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 	id, err := strconv.Atoi(req.URL.Query().Get("id"))
-	log.Println(id)
 	if err != nil || id < 1 {
 		http.NotFound(rw, req)
 		return
@@ -43,7 +46,7 @@ func showSnippet(rw http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(rw, "Display Snippet with specific ID %d", id)
 }
 
-func createSnippet(rw http.ResponseWriter, req *http.Request) {
+func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		// tells what methods are allowed
 		rw.Header().Set("Allow", "POST")
