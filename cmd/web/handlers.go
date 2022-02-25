@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/iBoBoTi/go-snippet/pkg/models"
 	"github.com/iBoBoTi/go-snippet/pkg/models/mysql"
 	"html/template"
 	"log"
@@ -48,8 +49,16 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 		app.notFound(rw)
 		return
 	}
+	s, err := app.snippets.Get(id)
+	if err == models.ErrNoRecord {
+		app.notFound(rw)
+		return
+	} else if err != nil {
+		app.serverError(rw, err)
+		return
+	}
 	//rw.Write([]byte("Display a specific snippet ..."))
-	fmt.Fprintf(rw, "Display Snippet with specific ID %d", id)
+	fmt.Fprintf(rw, "%v", s)
 }
 
 func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request) {
@@ -72,8 +81,18 @@ func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request)
 	// setting and changing system generated headers
 	rw.Header().Set("Content-Type", "application/json") // default text/plain
 
+	title := "O snail"
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi"
+	expires := "7"
+
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(rw, err)
+	}
+	http.Redirect(rw, req, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+
 	//Suppressing system generated headers
-	rw.Header()["Date"] = nil
-	rw.Write([]byte("Create a new snippet..."))
+	//rw.Header()["Date"] = nil
+	//rw.Write([]byte("Create a new snippet..."))
 
 }
