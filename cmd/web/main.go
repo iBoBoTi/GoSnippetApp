@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/iBoBoTi/go-snippet/pkg/models/mysql"
 	"log"
 	"net/http"
 	"os"
@@ -39,6 +40,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: &mysql.SnippetModel{DB: db},
 	}
 
 	srv := &http.Server{
