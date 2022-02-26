@@ -1,0 +1,31 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    font-family: "Ubuntu Mono", monospace;
+}
+html, body{
+    height: 100%;
+}
+body{
+    line-height: 1.5;
+    background-color: #f1f3f6;
+    color: #34495e;
+    overflow-y: scroll;
+}
+header, nav, section, footer{
+    padding: 2px calc((100% - 800px) / 2) 0;
+}
+section{
+    margin-top: 54px;
+    margin-bottom: 54px;
+    min-height: calc(100vh - 345px);
+    overflow: auto;
+}
+h1, a {
+    font-size: 36px;
+    font-weight: bold;
+    height: 36px;
+    padding-left: 50px;
+}
