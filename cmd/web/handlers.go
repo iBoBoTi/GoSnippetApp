@@ -16,6 +16,11 @@ type application struct {
 	snippets *mysql.SnippetModel
 }
 
+type templateData struct {
+	Snippet  *models.Snippet
+	Snippets []*models.Snippet
+}
+
 func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path != "/" {
@@ -23,6 +28,15 @@ func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 		app.notFound(rw)
 		return
 	}
+
+	s, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(rw, err)
+		return
+	}
+
+	data := &templateData{Snippets: s}
+
 	files := []string{
 		"./ui/html/home.page.gohtml",
 		"./ui/html/base.layout.gohtml",
@@ -34,7 +48,7 @@ func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 		app.serverError(rw, err)
 		return
 	}
-	err = ts.Execute(rw, nil)
+	err = ts.Execute(rw, data)
 	if err != nil {
 		app.errorLog.Println(err.Error())
 		//http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
@@ -58,7 +72,29 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	//rw.Write([]byte("Display a specific snippet ..."))
-	fmt.Fprintf(rw, "%v", s)
+	//fmt.Fprintf(rw, "%v", s)
+
+	data := &templateData{
+		Snippet: s,
+	}
+
+	files := []string{
+		"./ui/html/show.page.gohtml",
+		"./ui/html/base.layout.gohtml",
+		"./ui/html/footer.partial.gohtml",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		//http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(rw, err)
+		return
+	}
+	err = ts.Execute(rw, data)
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		//http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(rw, err)
+	}
 }
 
 func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request) {
