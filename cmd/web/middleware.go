@@ -9,3 +9,10 @@ func secureHeaders(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, req)
 	})
 }
+
+func (app *application) logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		app.infoLog.Printf("%s - %s %s %s", req.RemoteAddr, req.Proto, req.Method, req.URL)
+		next.ServeHTTP(rw, req)
+	})
+}
