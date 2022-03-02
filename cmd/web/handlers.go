@@ -52,7 +52,6 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 	}
 	//rw.Write([]byte("Display a specific snippet ..."))
 	//fmt.Fprintf(rw, "%v", s)
-
 	app.render(rw, req, "show.page.gohtml", &templateData{Snippet: s})
 }
 
