@@ -35,7 +35,11 @@ func (app *application) render(rw http.ResponseWriter, req *http.Request, name s
 	if err != nil {
 		app.serverError(rw, err)
 	}
-	buf.WriteTo(rw)
+
+	if _, err = buf.WriteTo(rw); err != nil {
+		app.serverError(rw, err)
+		return
+	}
 }
 
 func (app *application) addDefaultData(td *templateData, req *http.Request) *templateData {
