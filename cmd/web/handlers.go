@@ -57,11 +57,14 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 
 func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request) {
 	// setting and changing system generated headers
-	rw.Header().Set("Content-Type", "application/json") // default text/plain
+	err := req.ParseForm()
+	if err != nil {
+		app.clientError(rw, http.StatusBadRequest)
+	}
 
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi"
-	expires := "7"
+	title := req.PostForm.Get("title")
+	content := req.PostForm.Get("content")
+	expires := req.PostForm.Get("expires")
 
 	id, err := app.snippets.Insert(title, content, expires)
 	if err != nil {
@@ -76,5 +79,5 @@ func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request)
 }
 
 func (app *application) createSnippetForm(rw http.ResponseWriter, req *http.Request) {
-	rw.Write([]byte("Create a new snippet..."))
+	app.render(rw, req, "create.page.gohtml", nil)
 }
