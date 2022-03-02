@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/iBoBoTi/go-snippet/pkg/forms"
 	"github.com/iBoBoTi/go-snippet/pkg/models"
 	"github.com/iBoBoTi/go-snippet/pkg/models/mysql"
 	"html/template"
@@ -19,6 +20,7 @@ type application struct {
 
 type templateData struct {
 	CurrentYear int
+	Form        *forms.Form
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
@@ -50,8 +52,6 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 		app.serverError(rw, err)
 		return
 	}
-	//rw.Write([]byte("Display a specific snippet ..."))
-	//fmt.Fprintf(rw, "%v", s)
 	app.render(rw, req, "show.page.gohtml", &templateData{Snippet: s})
 }
 
@@ -62,22 +62,26 @@ func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request)
 		app.clientError(rw, http.StatusBadRequest)
 	}
 
-	title := req.PostForm.Get("title")
-	content := req.PostForm.Get("content")
-	expires := req.PostForm.Get("expires")
+	form := forms.New(req.PostForm)
+	form.Required("title", "content", "expires")
+	form.MaxLength("title", 100)
+	form.PermittedValues("expires", "365", "7", "1")
 
-	id, err := app.snippets.Insert(title, content, expires)
+	if !form.Valid() {
+		app.render(rw, req, "create.page.gohtml", &templateData{Form: form})
+		return
+	}
+
+	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
 	if err != nil {
 		app.serverError(rw, err)
 	}
 	http.Redirect(rw, req, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 
-	//Suppressing system generated headers
-	//rw.Header()["Date"] = nil
-	//rw.Write([]byte("Create a new snippet..."))
-
 }
 
 func (app *application) createSnippetForm(rw http.ResponseWriter, req *http.Request) {
-	app.render(rw, req, "create.page.gohtml", nil)
+	app.render(rw, req, "create.page.gohtml", &templateData{
+		Form: forms.New(nil),
+	})
 }
