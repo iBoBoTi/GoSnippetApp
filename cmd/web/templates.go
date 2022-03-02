@@ -28,7 +28,13 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		if err != nil {
 			return nil, err
 		}
-		ts, err = template.ParseGlob(filepath.Join(dir, "*partial.gohtml"))
+
+		ts, err = ts.ParseGlob(filepath.Join(dir, "*.layout.gohtml"))
+		if err != nil {
+			return nil, err
+		}
+
+		ts, err = ts.ParseGlob(filepath.Join(dir, "*.partial.gohtml"))
 		if err != nil {
 			return nil, err
 		}
