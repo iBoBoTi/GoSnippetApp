@@ -24,13 +24,6 @@ type templateData struct {
 }
 
 func (app *application) home(rw http.ResponseWriter, req *http.Request) {
-
-	if req.URL.Path != "/" {
-		//http.NotFound(rw, req)
-		app.notFound(rw)
-		return
-	}
-
 	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(rw, err)
@@ -43,7 +36,7 @@ func (app *application) home(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
-	id, err := strconv.Atoi(req.URL.Query().Get("id"))
+	id, err := strconv.Atoi(req.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
 		//http.NotFound(rw, req)
 		app.notFound(rw)
@@ -64,22 +57,6 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		// tells what methods are allowed
-		rw.Header().Set("Allow", "POST")
-		rw.Header().Add("Content-Type", "application/json")
-
-		//// writes the header
-		//rw.WriteHeader(http.StatusMethodNotAllowed)
-		//
-		//// writes to the response body
-		//rw.Write([]byte("Method Not Allowed\n"))
-
-		// shortcut for the above code --> combines WriteHeader method and Write method for non 200 status code
-		//http.Error(rw, "Method Not Allowed", http.StatusMethodNotAllowed)
-		app.clientError(rw, http.StatusMethodNotAllowed)
-		return
-	}
 	// setting and changing system generated headers
 	rw.Header().Set("Content-Type", "application/json") // default text/plain
 
@@ -91,10 +68,14 @@ func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request)
 	if err != nil {
 		app.serverError(rw, err)
 	}
-	http.Redirect(rw, req, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+	http.Redirect(rw, req, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 
 	//Suppressing system generated headers
 	//rw.Header()["Date"] = nil
 	//rw.Write([]byte("Create a new snippet..."))
 
+}
+
+func (app *application) createSnippetForm(rw http.ResponseWriter, req *http.Request) {
+	rw.Write([]byte("Create a new snippet..."))
 }
