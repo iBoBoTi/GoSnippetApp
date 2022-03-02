@@ -13,9 +13,9 @@ func (app *application) Routes() http.Handler {
 	mux := pat.New()
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 	mux.Get("/", http.HandlerFunc(app.home))
-	mux.Get("/snippet/:id", http.HandlerFunc(app.showSnippet))
 	mux.Get("/snippet/create", http.HandlerFunc(app.createSnippet))
-	mux.Post("/snippet/create", http.HandlerFunc(app.createSnippet))
+	mux.Post("/snippet/create", http.HandlerFunc(app.createSnippetForm))
+	mux.Get("/snippet/:id", http.HandlerFunc(app.showSnippet))
 	mux.Get("/static/", http.StripPrefix("/static", fileServer))
 	return standardMiddleware.Then(mux)
 }
