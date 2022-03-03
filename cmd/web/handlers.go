@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/golangcollege/sessions"
 	"github.com/iBoBoTi/go-snippet/pkg/forms"
 	"github.com/iBoBoTi/go-snippet/pkg/models"
 	"github.com/iBoBoTi/go-snippet/pkg/models/mysql"
@@ -14,6 +15,7 @@ import (
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
+	session       *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 }
