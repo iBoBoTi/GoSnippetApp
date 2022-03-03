@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"flag"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golangcollege/sessions"
 	"github.com/iBoBoTi/go-snippet/pkg/models/mysql"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func OpenDB(dns string) (*sql.DB, error) {
@@ -25,6 +27,7 @@ func main() {
 
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dns := flag.String("dns", "root:Boboti40@/go_snippet?parseTime=true", "MySQL Connection string")
+	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Secret key")
 
 	flag.Parse()
 
@@ -41,6 +44,9 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
+
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
