@@ -22,6 +22,7 @@ type application struct {
 
 type templateData struct {
 	CurrentYear int
+	Flash       string
 	Form        *forms.Form
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
@@ -54,7 +55,12 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 		app.serverError(rw, err)
 		return
 	}
-	app.render(rw, req, "show.page.gohtml", &templateData{Snippet: s})
+
+	flash := app.session.PopString(req, "flash")
+	app.render(rw, req, "show.page.gohtml", &templateData{
+		Flash:   flash,
+		Snippet: s,
+	})
 }
 
 func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request) {
@@ -78,8 +84,9 @@ func (app *application) createSnippet(rw http.ResponseWriter, req *http.Request)
 	if err != nil {
 		app.serverError(rw, err)
 	}
-	http.Redirect(rw, req, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 
+	app.session.Put(req, "flash", "Snippet successfully created!")
+	http.Redirect(rw, req, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) createSnippetForm(rw http.ResponseWriter, req *http.Request) {
