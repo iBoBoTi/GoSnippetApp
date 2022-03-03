@@ -46,6 +46,7 @@ func (app *application) addDefaultData(td *templateData, req *http.Request) *tem
 	if td == nil {
 		td = &templateData{}
 	}
+	td.Flash = app.session.PopString(req, "flash")
 	td.CurrentYear = time.Now().Year()
 	return td
 }
