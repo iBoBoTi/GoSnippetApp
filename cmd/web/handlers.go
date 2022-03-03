@@ -55,10 +55,7 @@ func (app *application) showSnippet(rw http.ResponseWriter, req *http.Request) {
 		app.serverError(rw, err)
 		return
 	}
-
-	flash := app.session.PopString(req, "flash")
 	app.render(rw, req, "show.page.gohtml", &templateData{
-		Flash:   flash,
 		Snippet: s,
 	})
 }
