@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+type contextKey string
+
+var contextKeyUser = contextKey("user")
+
 func OpenDB(dns string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dns)
 	if err != nil {
