@@ -36,7 +36,7 @@ func (m *UserModel) Insert(name, email, password string) error {
 func (m *UserModel) Authenticate(email, password string) (int, error) {
 	var id int
 	var hashedPw []byte
-	stmt := `SELECT id, hashed_password FROM users WHERE email = ? AND active = TRUE`
+	stmt := `SELECT id, hashed_password FROM users WHERE email = ?`
 	row := m.DB.QueryRow(stmt, email)
 	err := row.Scan(&id, &hashedPw)
 	if err != nil {
@@ -60,5 +60,13 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 }
 
 func (m *UserModel) Get(id int) (*models.User, error) {
-	return nil, nil
+	s := &models.User{}
+	stmt := `SELECT id, name, email, created FROM users WHERE id = ?`
+	err := m.DB.QueryRow(stmt, id).Scan(&s.ID, &s.Name, &s.Email, &s.Created)
+	if err == sql.ErrNoRows {
+		return nil, models.ErrNoRecord
+	} else if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
