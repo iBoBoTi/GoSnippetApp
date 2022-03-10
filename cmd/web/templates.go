@@ -7,7 +7,7 @@ import (
 )
 
 func humanDate(t time.Time) string {
-	return t.Format("01 Jan 2022 at 15:04")
+	return t.Format(time.RFC1123)
 }
 
 var functions = template.FuncMap{
