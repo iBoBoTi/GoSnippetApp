@@ -7,6 +7,9 @@ import (
 )
 
 func humanDate(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
 	return t.Format(time.RFC1123)
 }
 
